@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  EC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: ec2-sg-cf2
+      GroupDescription: Allow SSH and HTTP access
+      VpcId: !ImportValue vpc-test4
+      SecurityGroupIngress:
+        # http
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        # jenkins
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        # ssh
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  myEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties: 
+      EIP: !ImportValue EIP2
+      InstanceId: !Ref EC2A
+
+  EC2A: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-06098fd00463352b6 
+      KeyName: aws_test
+      InstanceType: t2.micro
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          SubnetId: !ImportValue public-subnet-1a-test4
+          GroupSet:
+            - !Ref EC2SG
+      UserData: !Base64 |
+        #!/bin/bash
+        sudo yum update -y
+      Tags:
+          - Key: Name
+            Value: EC2A
+
+Outputs:
+  EC2AOutput:
+    Value: !Ref EC2A
+    Export:
+      Name: "ec2-test4"
