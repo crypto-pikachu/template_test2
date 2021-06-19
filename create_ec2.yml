@@ -27,9 +27,9 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties: 
       EIP: !ImportValue EIP2
-      InstanceId: !Ref EC2A
+      InstanceId: !Ref EC2B
 
-  EC2A: 
+  EC2B: 
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: ami-06098fd00463352b6 
@@ -46,10 +46,10 @@ Resources:
         sudo yum update -y
       Tags:
           - Key: Name
-            Value: EC2A
+            Value: EC2B
 
 Outputs:
-  EC2AOutput:
-    Value: !Ref EC2A
+  EC2BOutput:
+    Value: !Ref EC2B
     Export:
       Name: "ec2-test4"
